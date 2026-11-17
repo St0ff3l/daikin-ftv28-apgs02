@@ -1,0 +1,397 @@
+# Annotated copy of SmartIR device code 9028. SmartIR loads `9028.json`, not this YAML file.
+# All IR payloads are copied unchanged. State fields are decoded from Broadlink pulses as Daikin64.
+# Byte indices start at 0; bits are transmitted least-significant bit first.
+# Byte 0: fixed identifier. Byte 1: high nibble = fan, low nibble = mode (2 = cool).
+# Byte 2: clock minutes (BCD). Byte 3: clock hours (BCD). Byte 6: target temperature (BCD).
+# Bytes 4-5: on/off timers; low 6 bits = BCD hour, bit 6 = half hour, bit 7 = timer enabled.
+# Byte 7: bit 0 = vertical swing, bit 1 = sleep, bit 2 = reserved, bit 3 = power toggle, bits 4-7 = checksum.
+# Checksum: sum the first 15 nibbles and keep the low 4 bits. All 61 payloads pass this check.
+# The `off` entry is a power-toggle frame with saved settings, not an absolute off command.
+# Cool frames have the power-toggle bit cleared; this does not guarantee that a powered-off unit will turn on.
+# The clock is the time encoded by the remote when the code was learned, not Home Assistant time.
+# Decoding is not a hardware test. No IR commands were transmitted for verification.
+# Protocol: https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Daikin.h
+# Checksum and BCD implementation: https://github.com/crankyoldgit/IRremoteESP8266/blob/master/src/ir_Daikin.cpp
+
+manufacturer: "Daikin"
+supportedModels: ["FTV28PV1L9-3WM-G1"]
+supportedController: "Broadlink"
+commandsEncoding: "Base64"
+minTemperature: 16.0
+maxTemperature: 30.0
+precision: 1.0
+operationModes: ["cool"]
+fanModes: ["auto", "low", "medium", "high"]
+commands:
+  # off / learned power_toggle: 23 C, medium fan (0x4), mode 2, clock 11:05.
+  # Power toggle=True; sleep=False; vertical swing=False.
+  # On timer: enabled=False; stored time=10:00.
+  # Off timer: enabled=False; stored time=10:00.
+  # Bytes 0-7: 16 42 05 11 10 10 23 7C; checksum=0x7 (valid).
+  off: "JgCWAAABOQABOgABOQABOpJQDAwLHwsfCw0LHwsMDAwLDQsMCx8LDAsMDAwLDQsfCwwMHgwMCx8LDQsMCw0LDAsNCx4LDQsMCw0LHwsMDAwLDQsMCw0LDAwLCx8LDQsMCw0LDAwMCw0LDAsfCw0LCwwNCx4LHwsNCwwMDAsfCw0LDAsNCwwMHgweDB4MHwsfCwwLAAKMkgANBQ=="
+  cool:
+    auto:
+      # cool.auto.16: 16 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 16 D4; checksum=0xD (valid).
+      "16": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLHwwfCwwLHwsMCwwMDAsMCwwLHwsMCx8MDAsfCx8LAAKMkwANBQ=="
+      # cool.auto.17: 17 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 17 E4; checksum=0xE (valid).
+      "17": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LHwwfCwwLHwsMCwwMDAsMCwwLHwsMCwwMHwsfCx8LAAKMkwANBQ=="
+      # cool.auto.18: 18 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 18 F4; checksum=0xF (valid).
+      "18": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLDAwMCx8LHwsMCwwMDAsMCwwLHwsMCx8MHwsfCx8LAAKMkwANBQ=="
+      # cool.auto.19: 19 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 19 04; checksum=0x0 (valid).
+      "19": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LDAwMCx8LHwsMCwwMDAsMCwwLHwsMCwwMDAsMCwwLAAKMkwANBQ=="
+      # cool.auto.20: 20 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 20 84; checksum=0x8 (valid).
+      "20": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLDAwMCwwLDAsfCwwMDAsMCwwLHwsMCwwMDAsMCx8LAAKMkwANBQ=="
+      # cool.auto.21: 21 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 21 94; checksum=0x9 (valid).
+      "21": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LDAwMCwwLDAsfCwwMDAsMCwwLHwsMCx8MDAsMCx8LAAKMkwANBQ=="
+      # cool.auto.22: 22 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 22 A4; checksum=0xA (valid).
+      "22": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLHwwMCwwLDAsfCwwMDAsMCwwLHwsMCwwMHwsMCx8LAAKMkwANBQ=="
+      # cool.auto.23: 23 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 23 B4; checksum=0xB (valid).
+      "23": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LHwwMCwwLDAsfCwwMDAsMCwwLHwsMCx8MHwsMCx8LAAKMkwANBQ=="
+      # cool.auto.24: 24 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 24 C4; checksum=0xC (valid).
+      "24": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLDAwfCwwLDAsfCwwMDAsMCwwLHwsMCwwMDAsfCx8LAAKMkwANBQ=="
+      # cool.auto.25: 25 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 25 D4; checksum=0xD (valid).
+      "25": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LDAwfCwwLDAsfCwwMDAsMCwwLHwsMCx8MDAsfCx8LAAKMkwANBQ=="
+      # cool.auto.26: 26 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 26 E4; checksum=0xE (valid).
+      "26": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLHwwfCwwLDAsfCwwMDAsMCwwLHwsMCwwMHwsfCx8LAAKMkwANBQ=="
+      # cool.auto.27: 27 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 27 F4; checksum=0xF (valid).
+      "27": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LHwwfCwwLDAsfCwwMDAsMCwwLHwsMCx8MHwsfCx8LAAKMkwANBQ=="
+      # cool.auto.28: 28 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 28 04; checksum=0x0 (valid).
+      "28": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLDAwMCx8LDAsfCwwMDAsMCwwLHwsMCwwMDAsMCwwLAAKMkwANBQ=="
+      # cool.auto.29: 29 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 29 14; checksum=0x1 (valid).
+      "29": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDB8LDAwMCx8LDAsfCwwMDAsMCwwLHwsMCx8MDAsMCwwLAAKMkwANBQ=="
+      # cool.auto.30: 30 C, auto fan (0x1), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 12 31 11 10 10 30 94; checksum=0x9 (valid).
+      "30": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfCwwMHwwMCwwLDAwMCx8LDAwMCh8LDAsMDAwLHwsMCwwLDAsfCx8LDAsMCx8LDAsMDAwLHwsMCwwLDAsMDAwLDAoMCx8MDAsMDAwLDAsMCwwLDAwfDAwLDAsMDAwLDAwMCwwLHwsfCwwMDAsMCwwLHwsMCx8MDAsMCx8LAAKMkwANBQ=="
+    low:
+      # cool.low.16: 16 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 16 44; checksum=0x4 (valid).
+      "16": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLHwwfDAwLHwsMCwwMDAsMDAwLHwsMCwwLDAsfDAwLAAKLkwANBQ=="
+      # cool.low.17: 17 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 17 54; checksum=0x5 (valid).
+      "17": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LHwwfDAwLHwsMCwwMDAsMDAwLHwsMCx8LDAsfDAwLAAKLkwANBQ=="
+      # cool.low.18: 18 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 18 64; checksum=0x6 (valid).
+      "18": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDB8LHwsMCwwMDAsMDAwLHwsMCwwLHwsfDAwLAAKLkwANBQ=="
+      # cool.low.19: 19 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 19 74; checksum=0x7 (valid).
+      "19": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDB8LHwsMCwwMDAsMDAwLHwsMCx8LHwsfDAwLAAKLkwANBQ=="
+      # cool.low.20: 20 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 20 F4; checksum=0xF (valid).
+      "20": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDAwLDAsfCwwMDAsMDAwLHwsMCx8LHwsfDB8LAAKLkwANBQ=="
+      # cool.low.21: 21 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 21 04; checksum=0x0 (valid).
+      "21": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDAwLDAsfCwwMDAsMDAwLHwsMCwwLDAsMDAwLAAKLkwANBQ=="
+      # cool.low.22: 22 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 22 14; checksum=0x1 (valid).
+      "22": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLHwwMDAwLDAsfCwwMDAsMDAwLHwsMCx8LDAsMDAwLAAKLkwANBQ=="
+      # cool.low.23: 23 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 23 24; checksum=0x2 (valid).
+      "23": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LHwwMDAwLDAsfCwwMDAsMDAwLHwsMCwwLHwsMDAwLAAKLkwANBQ=="
+      # cool.low.24: 24 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 24 34; checksum=0x3 (valid).
+      "24": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLDAwfDAwLDAsfCwwMDAsMDAwLHwsMCx8LHwsMDAwLAAKLkwANBQ=="
+      # cool.low.25: 25 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 25 44; checksum=0x4 (valid).
+      "25": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LDAwfDAwLDAsfCwwMDAsMDAwLHwsMCwwLDAsfDAwLAAKLkwANBQ=="
+      # cool.low.26: 26 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 26 54; checksum=0x5 (valid).
+      "26": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLHwwfDAwLDAsfCwwMDAsMDAwLHwsMCx8LDAsfDAwLAAKLkwANBQ=="
+      # cool.low.27: 27 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 27 64; checksum=0x6 (valid).
+      "27": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LHwwfDAwLDAsfCwwMDAsMDAwLHwsMCwwLHwsfDAwLAAKLkwANBQ=="
+      # cool.low.28: 28 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 28 74; checksum=0x7 (valid).
+      "28": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDB8LDAsfCwwMDAsMDAwLHwsMCx8LHwsfDAwLAAKLkwANBQ=="
+      # cool.low.29: 29 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 29 84; checksum=0x8 (valid).
+      "29": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDB8LDAsfCwwMDAsMDAwLHwsMCwwLDAsMDB8LAAKLkwANBQ=="
+      # cool.low.30: 30 C, low fan (0x8), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 82 31 11 10 10 30 04; checksum=0x0 (valid).
+      "30": "JgCWAAABOAABOgABOQABOpNQCwwLHwwfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsMDB8LHwsMDAwLDAwfCx8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAsMCx8LDAsMCwwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDAwLHwsfCwwMDAsMDAwLHwsMCwwLDAsMDAwLAAKLkwANBQ=="
+    medium:
+      # cool.medium.16: 16 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 16 04; checksum=0x0 (valid).
+      "16": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKHwwfDAwLHwsMCwwMDAoMDAwLHwsMCwwLDAsMCwwLAAKMkgANBQ=="
+      # cool.medium.17: 17 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 17 14; checksum=0x1 (valid).
+      "17": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KHwwfDAwLHwsMCwwMDAoMDAwLHwsMCx8LDAsMCwwLAAKMkgANBQ=="
+      # cool.medium.18: 18 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 18 24; checksum=0x2 (valid).
+      "18": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKDAwMDB8LHwsMCwwMDAoMDAwLHwsMCwwLHwsMCwwLAAKMkgANBQ=="
+      # cool.medium.19: 19 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 19 34; checksum=0x3 (valid).
+      "19": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KDAwMDB8LHwsMCwwMDAoMDAwLHwsMCx8LHwsMCwwLAAKMkgANBQ=="
+      # cool.medium.20: 20 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 20 B4; checksum=0xB (valid).
+      "20": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKDAwMDAwLDAsfCwwMDAoMDAwLHwsMCx8LHwsMCx8LAAKMkgANBQ=="
+      # cool.medium.21: 21 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 21 C4; checksum=0xC (valid).
+      "21": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KDAwMDAwLDAsfCwwMDAoMDAwLHwsMCwwLDAsfCx8LAAKMkgANBQ=="
+      # cool.medium.22: 22 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 22 D4; checksum=0xD (valid).
+      "22": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKHwwMDAwLDAsfCwwMDAoMDAwLHwsMCx8LDAsfCx8LAAKMkgANBQ=="
+      # cool.medium.23: 23 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 23 E4; checksum=0xE (valid).
+      "23": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KHwwMDAwLDAsfCwwMDAoMDAwLHwsMCwwLHwsfCx8LAAKMkgANBQ=="
+      # cool.medium.24: 24 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 24 F4; checksum=0xF (valid).
+      "24": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKDAwfDAwLDAsfCwwMDAoMDAwLHwsMCx8LHwsfCx8LAAKMkgANBQ=="
+      # cool.medium.25: 25 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 25 04; checksum=0x0 (valid).
+      "25": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KDAwfDAwLDAsfCwwMDAoMDAwLHwsMCwwLDAsMCwwLAAKMkgANBQ=="
+      # cool.medium.26: 26 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 26 14; checksum=0x1 (valid).
+      "26": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKHwwfDAwLDAsfCwwMDAoMDAwLHwsMCx8LDAsMCwwLAAKMkgANBQ=="
+      # cool.medium.27: 27 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 27 24; checksum=0x2 (valid).
+      "27": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KHwwfDAwLDAsfCwwMDAoMDAwLHwsMCwwLHwsMCwwLAAKMkgANBQ=="
+      # cool.medium.28: 28 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 28 34; checksum=0x3 (valid).
+      "28": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKDAwMDB8LDAsfCwwMDAoMDAwLHwsMCx8LHwsMCwwLAAKMkgANBQ=="
+      # cool.medium.29: 29 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 29 44; checksum=0x4 (valid).
+      "29": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCx8KDAwMDB8LDAsfCwwMDAoMDAwLHwsMCwwLDAsfCwwLAAKMkgANBQ=="
+      # cool.medium.30: 30 C, medium fan (0x4), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 42 31 11 10 10 30 C4; checksum=0xC (valid).
+      "30": "JgCWAAABOAABOgABOQABOpJRCwwLHwsfDAwLHwsMCwwLDAsMDB8MDAsMCwwMDAsfCwwLHwsMCwwLDAwfDB8LDAsMCx8LDAwMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMCwwLDAwMCwwLDAsfDAwLDAwMCwwKDAwMDAwLHwsfCwwMDAoMDAwLHwsMCwwLDAsfCx8LAAKMkgANBQ=="
+    high:
+      # cool.high.16: 16 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 16 E4; checksum=0xE (valid).
+      "16": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLHwwfDAwLHwoMCwwLDAsMCwwLHwsMCwwLHwwfCx8LAAKMkQANBQ=="
+      # cool.high.17: 17 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 17 F4; checksum=0xF (valid).
+      "17": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LHwwfDAwLHwoMCwwLDAsMCwwLHwsMCx8LHwwfCx8LAAKMkQANBQ=="
+      # cool.high.18: 18 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 18 04; checksum=0x0 (valid).
+      "18": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDB8LHwoMCwwLDAsMCwwLHwsMCwwLDAwMCwwLAAKMkQANBQ=="
+      # cool.high.19: 19 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 19 14; checksum=0x1 (valid).
+      "19": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDB8LHwoMCwwLDAsMCwwLHwsMCx8LDAwMCwwLAAKMkQANBQ=="
+      # cool.high.20: 20 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 20 94; checksum=0x9 (valid).
+      "20": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDAwLDAofCwwLDAsMCwwLHwsMCx8LDAwMCx8LAAKMkQANBQ=="
+      # cool.high.21: 21 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 21 A4; checksum=0xA (valid).
+      "21": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDAwLDAofCwwLDAsMCwwLHwsMCwwLHwwMCx8LAAKMkQANBQ=="
+      # cool.high.22: 22 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 22 B4; checksum=0xB (valid).
+      "22": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLHwwMDAwLDAofCwwLDAsMCwwLHwsMCx8LHwwMCx8LAAKMkQANBQ=="
+      # cool.high.23: 23 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 23 C4; checksum=0xC (valid).
+      "23": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LHwwMDAwLDAofCwwLDAsMCwwLHwsMCwwLDAwfCx8LAAKMkQANBQ=="
+      # cool.high.24: 24 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 24 D4; checksum=0xD (valid).
+      "24": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLDAwfDAwLDAofCwwLDAsMCwwLHwsMCx8LDAwfCx8LAAKMkQANBQ=="
+      # cool.high.25: 25 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 25 E4; checksum=0xE (valid).
+      "25": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LDAwfDAwLDAofCwwLDAsMCwwLHwsMCwwLHwwfCx8LAAKMkQANBQ=="
+      # cool.high.26: 26 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 26 F4; checksum=0xF (valid).
+      "26": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLHwwfDAwLDAofCwwLDAsMCwwLHwsMCx8LHwwfCx8LAAKMkQANBQ=="
+      # cool.high.27: 27 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 27 04; checksum=0x0 (valid).
+      "27": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LHwwfDAwLDAofCwwLDAsMCwwLHwsMCwwLDAwMCwwLAAKMkQANBQ=="
+      # cool.high.28: 28 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 28 14; checksum=0x1 (valid).
+      "28": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDB8LDAofCwwLDAsMCwwLHwsMCx8LDAwMCwwLAAKMkQANBQ=="
+      # cool.high.29: 29 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 29 24; checksum=0x2 (valid).
+      "29": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCx8LDAwMDB8LDAofCwwLDAsMCwwLHwsMCwwLHwwMCwwLAAKMkQANBQ=="
+      # cool.high.30: 30 C, high fan (0x2), mode 2, clock 11:31.
+      # Power toggle=False; sleep=False; vertical swing=False.
+      # On timer: enabled=False; stored time=10:00.
+      # Off timer: enabled=False; stored time=10:00.
+      # Bytes 0-7: 16 22 31 11 10 10 30 A4; checksum=0xA (valid).
+      "30": "JgCWAAABOQABOgABOQABOpNQCwwMHwwfDAwLHwsMCgwMDAoMDB8LDAsMCwwMHwwMCwwLHwsMDAwLDAwfCx8LDAwMCx8LDAsMCwwLHwsMDAwLDAsMCwwLDAwMCx8LDAsMDAwLDAwMCwwLDAwfDAwLDAsMCwwLDAwMDAwLHwofCwwLDAsMCwwLHwsMCwwLHwwMCx8LAAKMkQANBQ=="
+
